@@ -1,7 +1,15 @@
 import type { RecipeRepository } from '../recipe/repository';
 import type { MealRepository } from './repository';
 import { toMealLog, validateMealLogForm, type MealLogFormValues } from './schema';
-import type { MealLog } from './types';
+import type { MealLog, MealPhoto } from './types';
+
+export const MAX_MEAL_PHOTO_BYTES = 5 * 1024 * 1024;
+export const ACCEPTED_MEAL_PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'] as const;
+
+export type MealPhotoInput = {
+  blob: Blob;
+  name?: string;
+};
 
 export async function saveMealLog(
   mealRepository: MealRepository,
@@ -48,6 +56,50 @@ export async function applyRecipeToMealForm(recipeRepository: RecipeRepository, 
     proteinGrams: Math.round((recipe.totalProteinGrams / recipe.servingCount) * 10) / 10,
     recipeId: recipe.id,
   };
+}
+
+export async function addMealPhotos(
+  mealRepository: MealRepository,
+  mealLogId: string,
+  photos: MealPhotoInput[],
+  now: string,
+  createId: () => string = () => crypto.randomUUID(),
+): Promise<MealPhoto[]> {
+  const mealLog = await mealRepository.findLogById(mealLogId);
+  if (!mealLog) {
+    throw new Error('写真を追加する食事記録が見つかりませんでした。');
+  }
+
+  const savedPhotos: MealPhoto[] = [];
+  for (const photo of photos) {
+    validateMealPhoto(photo.blob);
+    const savedPhoto: MealPhoto = { id: createId(), mealLogId, blob: photo.blob, createdAt: now };
+    await mealRepository.addPhoto(savedPhoto);
+    savedPhotos.push(savedPhoto);
+  }
+
+  if (savedPhotos.length > 0) {
+    await mealRepository.updateLog(mealLogId, {
+      photoIds: [...mealLog.photoIds, ...savedPhotos.map((photo) => photo.id)],
+      updatedAt: now,
+    });
+  }
+
+  return savedPhotos;
+}
+
+export async function removeMealPhoto(mealRepository: MealRepository, photoId: string): Promise<void> {
+  await mealRepository.deletePhoto(photoId);
+}
+
+export function validateMealPhoto(blob: Blob): void {
+  if (!ACCEPTED_MEAL_PHOTO_TYPES.includes(blob.type as (typeof ACCEPTED_MEAL_PHOTO_TYPES)[number])) {
+    throw new Error('写真はJPEG、PNG、WebP、GIFから選んでください。');
+  }
+
+  if (blob.size > MAX_MEAL_PHOTO_BYTES) {
+    throw new Error('写真は5MB以下の画像を選んでください。');
+  }
 }
 
 function addDays(date: string, days: number): string {

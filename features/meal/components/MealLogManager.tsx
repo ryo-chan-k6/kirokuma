@@ -8,7 +8,7 @@ const mealSourceLabels = { home_cooking: '自炊', restaurant: '外食', conveni
 function toNumber(value: string): number { return value.trim() === '' ? Number.NaN : Number(value); }
 
 export function MealLogManager() {
-  const { values, recipes, logs, isLoading, isSaving, message, error, updateValues, applyRecipe, submit } = useMealLogManager();
+  const { values, recipes, logs, photosByMealLogId, selectedPhotos, isLoading, isSaving, message, error, updateValues, selectPhotos, unselectPhoto, deletePhoto, applyRecipe, submit } = useMealLogManager();
 
   return (
     <>
@@ -27,6 +27,8 @@ export function MealLogManager() {
             <label className="grid gap-1 text-sm font-semibold text-slate-700">カロリー<input className="rounded-2xl border border-orange-200 px-4 py-3" inputMode="decimal" type="number" min="0" step="0.1" value={Number.isNaN(values.calories) ? '' : values.calories} onChange={(event) => updateValues((current) => ({ ...current, calories: toNumber(event.target.value), recipeId: undefined }))} /></label>
             <label className="grid gap-1 text-sm font-semibold text-slate-700">たんぱく質<input className="rounded-2xl border border-orange-200 px-4 py-3" inputMode="decimal" type="number" min="0" step="0.1" value={Number.isNaN(values.proteinGrams) ? '' : values.proteinGrams} onChange={(event) => updateValues((current) => ({ ...current, proteinGrams: toNumber(event.target.value), recipeId: undefined }))} /></label>
           </div>
+          <label className="grid gap-2 text-sm font-semibold text-slate-700">写真<input className="rounded-2xl border border-dashed border-orange-200 bg-orange-50 px-4 py-3 text-sm" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple onChange={(event) => { selectPhotos(event.target.files); event.currentTarget.value = ''; }} /><span className="text-xs font-normal text-slate-500">5MB以下のJPEG / PNG / WebP / GIFを保存できます。</span></label>
+          {selectedPhotos.length > 0 ? <div className="grid grid-cols-3 gap-3">{selectedPhotos.map((photo) => <div key={photo.id} className="relative overflow-hidden rounded-2xl border border-orange-100"><img className="aspect-square w-full object-cover" src={photo.previewUrl} alt="追加予定の食事写真" /><button className="absolute right-1 top-1 rounded-full bg-white/90 px-2 py-1 text-xs font-bold text-red-600" type="button" onClick={() => unselectPhoto(photo.id)}>削除</button></div>)}</div> : null}
           <label className="grid gap-1 text-sm font-semibold text-slate-700">メモ<textarea className="min-h-20 rounded-2xl border border-orange-200 px-4 py-3" maxLength={300} value={values.memo ?? ''} onChange={(event) => updateValues((current) => ({ ...current, memo: event.target.value }))} placeholder="お腹の具合、満足度など" /></label>
           {message && <p className="rounded-2xl bg-green-50 p-3 text-sm font-semibold text-green-700">{message}</p>}
           {error && <p className="rounded-2xl bg-red-50 p-3 text-sm font-semibold text-red-700">{error}</p>}
@@ -37,7 +39,7 @@ export function MealLogManager() {
         <p className="text-sm font-semibold text-orange-600">直近7日間</p><h2 className="mt-2 text-xl font-bold">食事一覧</h2>
         {isLoading ? <p className="mt-4 text-sm text-slate-600">読み込んでいます…</p> : null}
         {!isLoading && logs.length === 0 ? <p className="mt-4 rounded-2xl bg-orange-50 p-4 text-sm text-slate-600">まだ食事記録がありません。まずは1食だけ記録してみましょう。</p> : null}
-        <ul className="mt-4 grid gap-3">{logs.map((log) => <li key={log.id} className="rounded-3xl border border-orange-100 bg-orange-50 p-4"><div className="flex items-center justify-between gap-2"><p className="font-bold text-slate-900">{log.title}</p><span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-orange-700">{mealTypeLabels[log.mealType]}</span></div><p className="mt-1 text-sm text-slate-700">{log.date}・{mealSourceLabels[log.mealSource]}</p><p className="mt-1 text-sm font-semibold text-slate-800">{log.calories}kcal / P{log.proteinGrams}g</p>{log.memo ? <p className="mt-2 text-xs text-slate-600">{log.memo}</p> : null}</li>)}</ul>
+        <ul className="mt-4 grid gap-3">{logs.map((log) => <li key={log.id} className="rounded-3xl border border-orange-100 bg-orange-50 p-4"><div className="flex items-center justify-between gap-2"><p className="font-bold text-slate-900">{log.title}</p><span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-orange-700">{mealTypeLabels[log.mealType]}</span></div><p className="mt-1 text-sm text-slate-700">{log.date}・{mealSourceLabels[log.mealSource]}</p><p className="mt-1 text-sm font-semibold text-slate-800">{log.calories}kcal / P{log.proteinGrams}g</p>{log.memo ? <p className="mt-2 text-xs text-slate-600">{log.memo}</p> : null}{(photosByMealLogId[log.id]?.length ?? 0) > 0 ? <div className="mt-3 grid grid-cols-3 gap-2">{photosByMealLogId[log.id].map((photo) => <div key={photo.id} className="relative overflow-hidden rounded-2xl bg-white"><img className="aspect-square w-full object-cover" src={photo.previewUrl} alt={`${log.title}の食事写真`} /><button className="absolute bottom-1 right-1 rounded-full bg-white/90 px-2 py-1 text-xs font-bold text-red-600" type="button" onClick={() => void deletePhoto(photo.id)}>削除</button></div>)}</div> : null}</li>)}</ul>
       </section>
     </>
   );

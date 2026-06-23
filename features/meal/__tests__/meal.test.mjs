@@ -30,14 +30,16 @@ assert.equal(future.success, false);
 assert.equal(future.errors.date, '未来日は記録できません。');
 
 const logs = [];
+const photos = [];
 const repository = {
   async createLog(input) { logs.push(input); },
   async updateLog(id, input) { const index = logs.findIndex((log) => log.id === id); logs[index] = { ...logs[index], ...input }; },
   async deleteLog() {},
   async findLogById(id) { return logs.find((log) => log.id === id); },
   async listLogsByDate(date) { return logs.filter((log) => log.date === date); },
-  async addPhoto() {},
-  async listPhotos() { return []; },
+  async addPhoto(input) { photos.push(input); },
+  async deletePhoto(id) { const index = photos.findIndex((photo) => photo.id === id); if (index >= 0) photos.splice(index, 1); },
+  async listPhotos(mealLogId) { return photos.filter((photo) => photo.mealLogId === mealLogId); },
 };
 
 const saved = await usecases.saveMealLog(repository, { date: '2026-06-23', mealType: 'breakfast', mealSource: 'home_cooking', title: ' 卵かけごはん ', calories: 420, proteinGrams: 18, memo: ' 朝 ' }, '2026-06-23', '2026-06-23T07:00:00.000Z', undefined, () => 'meal-1');
@@ -52,5 +54,17 @@ assert.equal(applied.title, '鶏むね丼');
 assert.equal(applied.calories, 450);
 assert.equal(applied.proteinGrams, 35);
 assert.equal(applied.mealSource, 'home_cooking');
+
+const savedPhotos = await usecases.addMealPhotos(repository, 'meal-1', [{ blob: new Blob(['photo'], { type: 'image/png' }), name: 'meal.png' }], '2026-06-23T07:01:00.000Z', () => 'photo-1');
+assert.equal(savedPhotos.length, 1);
+assert.equal(savedPhotos[0].id, 'photo-1');
+assert.deepEqual(logs[0].photoIds, ['photo-1']);
+assert.equal((await repository.listPhotos('meal-1')).length, 1);
+
+assert.throws(() => usecases.validateMealPhoto(new Blob(['text'], { type: 'text/plain' })), /JPEG/);
+assert.throws(() => usecases.validateMealPhoto(new Blob([new Uint8Array(usecases.MAX_MEAL_PHOTO_BYTES + 1)], { type: 'image/jpeg' })), /5MB/);
+
+await usecases.removeMealPhoto(repository, 'photo-1');
+assert.equal((await repository.listPhotos('meal-1')).length, 0);
 
 console.log('meal tests passed');
