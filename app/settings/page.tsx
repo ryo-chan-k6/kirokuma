@@ -1,3 +1,5 @@
+import { DataPortabilityPanel } from '../../features/data-portability/components/DataPortabilityPanel';
+
 export default function SettingsPage() {
   return (
     <main className="mx-auto flex min-h-screen max-w-sm flex-col gap-5 bg-orange-50 px-4 py-6 text-slate-900">
@@ -29,6 +31,8 @@ export default function SettingsPage() {
       <p className="rounded-2xl bg-amber-100 p-4 text-xs leading-6 text-amber-900">
         表示されるカロリー・たんぱく質目標は目安です。体調不良、既往歴、極端な食事制限がある場合は専門家に相談してください。
       </p>
+
+      <DataPortabilityPanel />
     </main>
   );
 }
