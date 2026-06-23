@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "tsc --noEmit",
-    "test": "npm run build && node tests/indexeddb-schema.test.mjs"
+    "test": "npm run build && node tests/indexeddb-schema.test.mjs && node features/settings/__tests__/calculations.test.mjs"
   },
   "dependencies": {
     "dexie": "^4.0.11"
