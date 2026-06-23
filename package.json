@@ -1,5 +1,15 @@
 {
   "name": "kirokuma",
   "version": "0.1.0",
-  "private": true
+  "private": true,
+  "scripts": {
+    "build": "tsc --noEmit",
+    "test": "npm run build && node tests/indexeddb-schema.test.mjs"
+  },
+  "dependencies": {
+    "dexie": "^4.0.11"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
 }
