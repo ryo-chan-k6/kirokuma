@@ -1,4 +1,5 @@
 import { TodayWorkoutCard } from '../../features/workout/components/TodayWorkoutCard';
+import { WorkoutSessionForm } from '../../features/workout/components/WorkoutSessionForm';
 import { INITIAL_WORKOUT_PLANS, listInitialWorkoutExercisesByPlan } from '../../features/workout/initial-data';
 import { formatWorkoutExerciseSummary, formatWorkoutPlanTitle } from '../../features/workout/components/WorkoutPlanList';
 
@@ -12,6 +13,7 @@ export default function WorkoutsPage() {
       </section>
 
       <TodayWorkoutCard />
+      <WorkoutSessionForm />
 
       <section className="rounded-3xl bg-white p-5 shadow-sm">
         <p className="text-sm font-semibold text-orange-600">メニュー一覧</p>
