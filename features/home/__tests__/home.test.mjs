@@ -26,7 +26,7 @@ writeFileSync(tsconfigPath, JSON.stringify({
 }));
 execFileSync('npx', ['tsc', '--project', tsconfigPath], { stdio: 'inherit' });
 
-const { getHomeSummary, listRecentDates } = await import(join(outDir, 'features/home/usecases.js'));
+const { buildHomeReminders, getHomeSummary, listRecentDates } = await import(join(outDir, 'features/home/usecases.js'));
 const initialData = await import(join(outDir, 'features/workout/initial-data.js'));
 
 assert.deepEqual(listRecentDates('2026-06-23', 3), ['2026-06-23', '2026-06-22', '2026-06-21']);
@@ -64,5 +64,15 @@ assert.equal(summary.weeklyWorkoutCount, 2);
 assert.equal(summary.recentStatuses[0].hasBodyRecord, true);
 assert.equal(summary.recentStatuses[0].mealLogCount, 2);
 assert.equal(summary.recentStatuses[0].hasWorkout, true);
+assert.equal(summary.reminders.length, 5);
+assert.equal(summary.reminders.find((reminder) => reminder.kind === 'body').done, true);
+assert.equal(summary.reminders.find((reminder) => reminder.kind === 'breakfast').done, true);
+assert.equal(summary.reminders.find((reminder) => reminder.kind === 'lunch').done, true);
+assert.equal(summary.reminders.find((reminder) => reminder.kind === 'dinner').done, false);
+assert.equal(summary.reminders.find((reminder) => reminder.kind === 'workout').done, true);
+
+const reminders = buildHomeReminders([], { date: '2026-06-23', hasBodyRecord: false, mealLogCount: 0, hasWorkout: false }, summary.todayWorkout);
+assert.deepEqual(reminders.map((reminder) => reminder.done), [false, false, false, false, false]);
+assert.equal(reminders.find((reminder) => reminder.kind === 'workout').href, '/workouts');
 
 console.log('home summary tests passed');
