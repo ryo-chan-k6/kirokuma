@@ -24,5 +24,14 @@ export const indexedDbWorkoutRepository: WorkoutRepository = {
       await Promise.all(logs.map((log) => db.workoutExerciseLogs.add(log)));
     });
   },
-  async findLatestCompletedSession() { return db.workoutSessions.where('completed').equals(true).first(); },
+  async findLatestCompletedSession() {
+    const sessions = await db.workoutSessions.where('completed').equals(true).toArray();
+    return sessions.sort((a, b) => {
+      const dateComparison = b.date.localeCompare(a.date);
+      if (dateComparison !== 0) {
+        return dateComparison;
+      }
+      return b.createdAt.localeCompare(a.createdAt);
+    })[0];
+  },
 };
