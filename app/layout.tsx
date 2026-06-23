@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { RegisterServiceWorker } from '../components/pwa/RegisterServiceWorker';
+import { PasscodeGate } from '../features/passcode/components/PasscodeGate';
 
 export const metadata: Metadata = {
   title: 'きろくま',
@@ -34,7 +35,7 @@ export default function RootLayout({
     <html lang="ja">
       <body className="antialiased">
         <RegisterServiceWorker />
-        {children}
+        <PasscodeGate>{children}</PasscodeGate>
       </body>
     </html>
   );

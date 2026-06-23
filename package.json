@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "npm run typecheck && node tests/indexeddb-schema.test.mjs && node features/settings/__tests__/calculations.test.mjs && node features/body-record/__tests__/body-record.test.mjs && node features/workout/__tests__/initial-data.test.mjs && node features/workout/__tests__/rotation.test.mjs && node features/workout/__tests__/session.test.mjs && node features/food/__tests__/food.test.mjs && node features/recipe/__tests__/recipe.test.mjs && node features/meal/__tests__/meal.test.mjs && node features/home/__tests__/home.test.mjs && node features/analytics/__tests__/analytics.test.mjs && node features/data-portability/__tests__/data-portability.test.mjs"
+    "test": "npm run typecheck && node tests/indexeddb-schema.test.mjs && node features/settings/__tests__/calculations.test.mjs && node features/body-record/__tests__/body-record.test.mjs && node features/workout/__tests__/initial-data.test.mjs && node features/workout/__tests__/rotation.test.mjs && node features/workout/__tests__/session.test.mjs && node features/food/__tests__/food.test.mjs && node features/recipe/__tests__/recipe.test.mjs && node features/meal/__tests__/meal.test.mjs && node features/home/__tests__/home.test.mjs && node features/analytics/__tests__/analytics.test.mjs && node features/data-portability/__tests__/data-portability.test.mjs && node features/passcode/__tests__/passcode.test.mjs"
   },
   "dependencies": {
     "dexie": "^4.0.11",
