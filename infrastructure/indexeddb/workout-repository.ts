@@ -26,12 +26,20 @@ export const indexedDbWorkoutRepository: WorkoutRepository = {
   },
   async findLatestCompletedSession() {
     const sessions = await db.workoutSessions.where('completed').equals(true).toArray();
-    return sessions.sort((a, b) => {
-      const dateComparison = b.date.localeCompare(a.date);
-      if (dateComparison !== 0) {
-        return dateComparison;
-      }
-      return b.createdAt.localeCompare(a.createdAt);
-    })[0];
+    return sortWorkoutSessionsNewestFirst(sessions)[0];
+  },
+  async listCompletedSessionsSince(date: string) {
+    const sessions = await db.workoutSessions.where('completed').equals(true).toArray();
+    return sortWorkoutSessionsNewestFirst(sessions.filter((session) => session.date >= date));
   },
 };
+
+function sortWorkoutSessionsNewestFirst(sessions: WorkoutSession[]): WorkoutSession[] {
+  return sessions.sort((a, b) => {
+    const dateComparison = b.date.localeCompare(a.date);
+    if (dateComparison !== 0) {
+      return dateComparison;
+    }
+    return b.createdAt.localeCompare(a.createdAt);
+  });
+}

@@ -40,7 +40,8 @@ const repository = {
   async listPlanExercises(workoutPlanId) { return initialData.listInitialWorkoutExercisesByPlan(workoutPlanId); },
   async saveInitialPlans() {},
   async createSession(session, logs) { saved.push({ session, logs }); },
-  async findLatestCompletedSession() { return saved.at(-1)?.session; },
+  async listCompletedSessionsSince() { return []; },
+    async findLatestCompletedSession() { return saved.at(-1)?.session; },
 };
 
 let id = 0;
