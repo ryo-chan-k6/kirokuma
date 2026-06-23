@@ -7,5 +7,6 @@ export type MealRepository = {
   findLogById(id: string): Promise<MealLog | undefined>;
   listLogsByDate(date: string): Promise<MealLog[]>;
   addPhoto(input: MealPhoto): Promise<void>;
+  deletePhoto(id: string): Promise<void>;
   listPhotos(mealLogId: string): Promise<MealPhoto[]>;
 };
