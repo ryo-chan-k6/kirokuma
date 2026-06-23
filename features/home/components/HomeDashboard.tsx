@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useMemo } from 'react';
 import { useHomeSummary } from '../hooks/useHomeSummary';
 
@@ -15,18 +16,20 @@ export function HomeDashboard() {
     return <section className="rounded-3xl bg-white p-5 text-sm text-red-600 shadow-sm">{error ?? 'ホームのデータを表示できませんでした。'}</section>;
   }
 
-  const todayBodyRecorded = summary.recentStatuses[0]?.hasBodyRecord ?? false;
-  const todayWorkoutDone = summary.recentStatuses[0]?.hasWorkout ?? false;
+  const remainingReminderCount = summary.reminders.filter((reminder) => !reminder.done).length;
 
   return (
     <>
       <section className="rounded-3xl bg-white p-5 shadow-sm">
         <p className="text-sm font-semibold text-orange-600">{formatJapaneseDate(summary.today)}</p>
         <h2 className="mt-2 text-xl font-bold">今日のやること</h2>
+        <p className="mt-2 text-sm text-slate-600">
+          {remainingReminderCount === 0 ? '今日のリマインダーはすべて完了です。ゆっくり休みましょう。' : `あと${remainingReminderCount}件、できるところから進めましょう。`}
+        </p>
         <div className="mt-4 grid gap-3">
-          <TaskItem done={todayBodyRecorded} label="体重を記録" />
-          <TaskItem done={summary.todayMeals.length > 0} label="食事を記録" />
-          <TaskItem done={todayWorkoutDone} label={`${formatDay(summary.todayWorkout.plan.dayCode)}：${summary.todayWorkout.plan.name}`} />
+          {summary.reminders.map((reminder) => (
+            <TaskItem key={reminder.kind} done={reminder.done} label={reminder.label} detail={reminder.detail} href={reminder.href} />
+          ))}
         </div>
       </section>
 
@@ -60,8 +63,13 @@ export function HomeDashboard() {
   );
 }
 
-function TaskItem({ done, label }: { done: boolean; label: string }) {
-  return <div className={`rounded-2xl px-4 py-3 text-sm font-semibold ${done ? 'bg-emerald-50 text-emerald-700' : 'bg-orange-100 text-orange-800'}`}>{done ? 'できた！' : 'これから'}：{label}</div>;
+function TaskItem({ done, label, detail, href }: { done: boolean; label: string; detail: string; href: string }) {
+  return (
+    <Link href={href} className={`block rounded-2xl px-4 py-3 text-sm ${done ? 'bg-emerald-50 text-emerald-700' : 'bg-orange-100 text-orange-800'}`}>
+      <span className="font-semibold">{done ? 'できた！' : 'これから'}：{label}</span>
+      <span className="mt-1 block text-xs leading-5 opacity-80">{detail}</span>
+    </Link>
+  );
 }
 
 function MetricCard({ label, value, note }: { label: string; value: string; note: string }) {
