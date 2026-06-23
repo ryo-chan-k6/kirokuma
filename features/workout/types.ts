@@ -20,13 +20,15 @@ export type WorkoutPlanExercise = {
   displayOrder: number;
 };
 
+export type EffortLevel = 'easy' | 'normal' | 'hard';
+
 export type WorkoutSession = {
   id: string;
   date: string;
   workoutPlanId: string;
   dayCode: PlanDay;
   durationMinutes?: number;
-  effortLevel?: 'easy' | 'normal' | 'hard';
+  effortLevel?: EffortLevel;
   completed: boolean;
   memo?: string;
   createdAt: string;

@@ -1,5 +1,6 @@
 import { INITIAL_WORKOUT_PLAN_EXERCISES, INITIAL_WORKOUT_PLANS } from './initial-data';
 import type { WorkoutRepository } from './repository';
+import { toWorkoutExerciseLogs, toWorkoutSession, validateWorkoutSessionForm, type WorkoutSessionFormValues } from './schema';
 import type { PlanDay, WorkoutPlan, WorkoutPlanExercise, WorkoutSession } from './types';
 
 const ROTATION_DAYS: PlanDay[] = ['DAY_1', 'DAY_2', 'DAY_3', 'DAY_4', 'DAY_5'];
@@ -45,4 +46,26 @@ export async function getTodayWorkout(repository: WorkoutRepository): Promise<To
 
   const exercises = await repository.listPlanExercises(plan.id);
   return { plan, exercises, latestCompletedSession };
+}
+
+
+export async function saveWorkoutSession(
+  repository: WorkoutRepository,
+  values: WorkoutSessionFormValues,
+  today: string,
+  now: string,
+  createId: () => string = () => crypto.randomUUID(),
+): Promise<WorkoutSession> {
+  const validation = validateWorkoutSessionForm(values, today);
+  if (!validation.success) {
+    throw new Error(validation.errors[0] ?? '筋トレ記録の入力内容を確認してください。');
+  }
+
+  const todayWorkout = await getTodayWorkout(repository);
+  const sessionId = createId();
+  const session = toWorkoutSession(validation.data, sessionId, todayWorkout.plan.id, todayWorkout.plan.dayCode, now);
+  const logs = toWorkoutExerciseLogs(validation.data, sessionId, createId);
+
+  await repository.createSession(session, logs);
+  return session;
 }
