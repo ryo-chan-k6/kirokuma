@@ -42,7 +42,8 @@ await usecases.ensureInitialWorkoutPlans({
   async listPlanExercises() { return []; },
   async saveInitialPlans(plans, exercises) { calls.push({ plans, exercises }); },
   async createSession() {},
-  async findLatestCompletedSession() { return undefined; },
+  async listCompletedSessionsSince() { return []; },
+    async findLatestCompletedSession() { return undefined; },
 });
 assert.equal(calls.length, 1);
 assert.equal(calls[0].plans.length, 5);

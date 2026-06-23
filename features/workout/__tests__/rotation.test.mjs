@@ -33,6 +33,7 @@ function createRepository(latestCompletedSession) {
     async listPlanExercises(workoutPlanId) { return initialData.listInitialWorkoutExercisesByPlan(workoutPlanId); },
     async saveInitialPlans(plans, exercises) { calls.push({ plans, exercises }); },
     async createSession() {},
+    async listCompletedSessionsSince() { return []; },
     async findLatestCompletedSession() { return latestCompletedSession; },
   };
 }

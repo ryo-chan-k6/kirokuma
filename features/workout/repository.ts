@@ -7,4 +7,5 @@ export type WorkoutRepository = {
   saveInitialPlans(plans: WorkoutPlan[], exercises: WorkoutPlanExercise[]): Promise<void>;
   createSession(input: WorkoutSession, logs: WorkoutExerciseLog[]): Promise<void>;
   findLatestCompletedSession(): Promise<WorkoutSession | undefined>;
+  listCompletedSessionsSince(date: string): Promise<WorkoutSession[]>;
 };
