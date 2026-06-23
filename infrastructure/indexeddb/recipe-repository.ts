@@ -10,7 +10,25 @@ export const indexedDbRecipeRepository: RecipeRepository = {
     });
   },
   async update(id: string, input: Partial<Recipe>) { await db.recipes.update(id, input); },
-  async delete(id: string) { await db.recipes.delete(id); },
+  async updateWithIngredients(id: string, input: Recipe, ingredients: RecipeIngredient[]) {
+    await db.transaction('rw', db.recipes, db.recipeIngredients, async () => {
+      await db.recipes.update(id, input);
+      const currentIngredients = await db.recipeIngredients.where('recipeId').equals(id).toArray();
+      await Promise.all(currentIngredients.map((ingredient) => db.recipeIngredients.delete(ingredient.id)));
+      await Promise.all(ingredients.map((ingredient) => db.recipeIngredients.add(ingredient)));
+    });
+  },
+  async delete(id: string) {
+    await db.transaction('rw', db.recipes, db.recipeIngredients, async () => {
+      await db.recipes.delete(id);
+      const currentIngredients = await db.recipeIngredients.where('recipeId').equals(id).toArray();
+      await Promise.all(currentIngredients.map((ingredient) => db.recipeIngredients.delete(ingredient.id)));
+    });
+  },
   async findById(id: string) { return db.recipes.get(id); },
+  async listAll() {
+    const recipes = await db.recipes.toArray();
+    return recipes.sort((a, b) => a.name.localeCompare(b.name, 'ja'));
+  },
   async listIngredients(recipeId: string) { return db.recipeIngredients.where('recipeId').equals(recipeId).toArray(); },
 };
