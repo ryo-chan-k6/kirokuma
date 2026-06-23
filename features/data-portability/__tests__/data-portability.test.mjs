@@ -7,10 +7,10 @@ const compiled = ts.transpileModule(source, {
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
 }).outputText;
 
-const module = { exports: {} };
-new Function('exports', 'module', compiled)(module.exports, module);
+const compiledModule = { exports: {} };
+new Function('exports', 'module', compiled)(compiledModule.exports, compiledModule);
 
-const { EXPORT_FORMAT, parseBackupJson, serializeBackup } = module.exports;
+const { EXPORT_FORMAT, parseBackupJson, serializeBackup } = compiledModule.exports;
 
 const emptyBackup = {
   format: EXPORT_FORMAT,

@@ -14,8 +14,12 @@ export function useHomeSummary(today: string) {
 
   useEffect(() => {
     let ignore = false;
-    setIsLoading(true);
-    setError(undefined);
+    queueMicrotask(() => {
+      if (!ignore) {
+        setIsLoading(true);
+        setError(undefined);
+      }
+    });
 
     getHomeSummary({
       bodyRecordRepository: indexedDbBodyRecordRepository,

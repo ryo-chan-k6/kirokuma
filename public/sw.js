@@ -1,5 +1,6 @@
-const CACHE_NAME = 'kirokuma-pwa-v1';
-const APP_SHELL_URLS = ['/', '/manifest.webmanifest', '/icon.svg', '/maskable-icon.svg'];
+const CACHE_NAME = 'kirokuma-pwa-v2';
+const OFFLINE_URL = '/offline.html';
+const APP_SHELL_URLS = ['/', OFFLINE_URL, '/manifest.webmanifest', '/icon.svg', '/maskable-icon.svg'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -26,13 +27,28 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
+          return response;
+        })
+        .catch(() => caches.match(event.request).then((cachedResponse) => cachedResponse ?? caches.match(OFFLINE_URL))),
+    );
+    return;
+  }
+
   event.respondWith(
-    fetch(event.request)
-      .then((response) => {
-        const responseClone = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
-        return response;
-      })
-      .catch(() => caches.match(event.request).then((cachedResponse) => cachedResponse ?? caches.match('/'))),
+    caches.match(event.request).then(
+      (cachedResponse) =>
+        cachedResponse ??
+        fetch(event.request).then((response) => {
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
+          return response;
+        }),
+    ),
   );
 });

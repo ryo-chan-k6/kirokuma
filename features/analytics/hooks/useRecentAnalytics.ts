@@ -14,7 +14,9 @@ export function useRecentAnalytics(today: string) {
 
   useEffect(() => {
     let cancelled = false;
-    setIsLoading(true);
+    queueMicrotask(() => {
+      if (!cancelled) setIsLoading(true);
+    });
     getRecentAnalytics({
       bodyRecordRepository: indexedDbBodyRecordRepository,
       mealRepository: indexedDbMealRepository,
