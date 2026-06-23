@@ -1,4 +1,5 @@
 import { DataPortabilityPanel } from '../../features/data-portability/components/DataPortabilityPanel';
+import { PasscodeSettingsPanel } from '../../features/passcode/components/PasscodeSettingsPanel';
 
 export default function SettingsPage() {
   return (
@@ -32,6 +33,7 @@ export default function SettingsPage() {
         表示されるカロリー・たんぱく質目標は目安です。体調不良、既往歴、極端な食事制限がある場合は専門家に相談してください。
       </p>
 
+      <PasscodeSettingsPanel />
       <DataPortabilityPanel />
     </main>
   );
