@@ -7,7 +7,6 @@ import { getSettingsTargets } from '../settings/usecases';
 import type { AppSettings } from '../settings/types';
 import type { WorkoutRepository } from '../workout/repository';
 import { getTodayWorkout, type TodayWorkout } from '../workout/usecases';
-import type { WorkoutSession } from '../workout/types';
 
 export type HomeRepositories = {
   bodyRecordRepository: BodyRecordRepository;
@@ -61,8 +60,8 @@ export async function getHomeSummary(repositories: HomeRepositories, today: stri
     settings,
     currentBodyRecord: sortedBodyRecords[0],
     targetWeightKg: settings?.targetWeightKg,
-    targetCalories: targets?.targetCalories,
-    targetProteinGrams: targets?.targetProteinGrams,
+    targetCalories: targets?.targetCaloriesKcal,
+    targetProteinGrams: targets?.targetProteinG,
     todayMeals,
     todayCalories: sumBy(todayMeals, (meal) => meal.calories),
     todayProteinGrams: sumBy(todayMeals, (meal) => meal.proteinGrams),

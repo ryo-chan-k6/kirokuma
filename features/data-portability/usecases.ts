@@ -88,7 +88,8 @@ function isBackupData(value: unknown): value is KirokumaBackupData {
     return false;
   }
 
-  return requiredCollections.every((key) => Array.isArray(value.data[key]));
+  const data = value.data;
+  return requiredCollections.every((key) => Array.isArray(data[key]));
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

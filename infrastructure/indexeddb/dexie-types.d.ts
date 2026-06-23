@@ -2,6 +2,8 @@ declare module 'dexie' {
   export type Table<T, Key = string> = {
     add(item: T): Promise<Key>;
     put(item: T): Promise<Key>;
+    bulkPut(items: T[]): Promise<Key>;
+    clear(): Promise<void>;
     update(key: Key, changes: Partial<T>): Promise<number>;
     delete(key: Key): Promise<void>;
     get(key: Key): Promise<T | undefined>;
@@ -17,6 +19,7 @@ declare module 'dexie' {
     constructor(name: string);
     version(versionNumber: number): { stores(schema: Record<string, string>): void };
     table<T, Key = string>(name: string): Table<T, Key>;
+    tables: Table<unknown, string>[];
     transaction<T>(mode: 'r' | 'rw', ...args: unknown[]): Promise<T>;
   }
 }
